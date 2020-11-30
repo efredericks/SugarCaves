@@ -515,8 +515,9 @@ setup.traceryImport
 		}
 		map[row] = t_row;
 	}
-	window.GameMap = map;
-	console.log(window.GameMap);
+	//window.GameMap = map;
+	setup.map = map;
+	console.log(setup.map);//window.GameMap);
 	
 	grammar.addModifiers(baseEngModifiers);
 	var story = grammar.flatten("#origin#");
@@ -570,6 +571,18 @@ class Player {
   get pos() {
     return this.row + "x" + this.col;
   }
+	get userRow() {
+		return this.row;
+	}
+	get userCol() {
+		return this.col;
+	}
+	set userRow(r) {
+		this.row = r;
+	}
+	set userCol(c) {
+		this.col = c;
+	}
 	clone() {
     return new Player(this);
   }
@@ -581,8 +594,160 @@ class Player {
     return JSON.reviveWrapper('new Player($ReviveData$)', ownData);
   }
 }
+window.Player = Player;
 
-window.Player = Player;</script><tw-passagedata pid="1" name="StoryInit" tags="" position="95,93" size="100,100">/* 
+// Class that represents a game object
+class Game {
+  constructor(opts) {
+    this.name = '';
+		this.map  = null;
+				
+    /* call with a config object, overriding some or all of the above */
+    if(typeof opts === "object") {
+      Object.keys(opts).forEach(function (pn) {
+        this[pn] = clone(opts[pn]);
+      }, this);
+    }
+  }
+	get gameMap() {
+		return this.map;
+	}
+	clone() {
+    return new Game(this);
+  }
+  toJSON() {
+    var ownData = {};
+    Object.keys(this).forEach(function (pn) {
+      ownData[pn] = clone(this[pn]);
+    }, this);
+    return JSON.reviveWrapper('new Game($ReviveData$)', ownData);
+  }
+}
+window.Game = Game;
+
+/*************************/
+// c/o https://gist.github.com/Akjosch/baa4ff7b69795b91e2161688ba6d55ae
+/* This is a helper class, to make Promises you can easily pull the value from synchronously */
+
+const InspectablePromise = (function() {
+	var statusProp = Symbol("status");
+	var progressProp = Symbol("progress");
+	var valueProp = Symbol("value");
+	var reasonProp = Symbol("reason");
+
+	/**
+	 * Inspectable Promise
+	 */
+	class InspectablePromise extends Promise {
+		/**
+		 * @param {(resolve: (value: any) => void, reject: (reason: any) => void, progress: (progress: any) => void) => void} executor
+		 */
+		constructor(executor) {
+			var self;
+			super((resolve, reject) => {
+				executor(
+					(value) => {
+						if(self) {
+							self[statusProp] = "resolved";
+							self[valueProp] = value;
+							resolve(value);
+						} else {
+							setTimeout(() => {
+								self[statusProp] = "resolved";
+								self[valueProp] = value;
+								resolve(value);
+							}, 0);
+						}
+					},
+					(reason) => {
+						if(self) {
+							self[statusProp] = "rejected";
+							self[reasonProp] = reason;
+							reject(reason);
+						} else {
+							setTimeout(() => {
+								self[statusProp] = "rejected";
+								self[reasonProp] = reason;
+								reject(reason);
+							}, 0);
+						}
+					},
+					(progress) => {
+						if(self) {
+							self[progressProp] = progress;
+						} else {
+							setTimeout(() => { self[progressProp] = progress; }, 0);
+						}
+					}
+				);
+			});
+			self = this;
+			this[statusProp] = "pending";
+		}
+
+		get status() { return this[statusProp]; }
+		get pending() { return this[statusProp] === "pending"; }
+		get resolved() { return this[statusProp] === "resolved"; }
+		get rejected() { return this[statusProp] === "rejected"; }
+		get value() { return this[valueProp]; }
+		get reason() { return this[reasonProp]; }
+		get progress() { return this[progressProp]; }
+	}
+
+	return InspectablePromise;
+})();
+
+
+Macro.add("when", {
+	skipArgs: true,
+	isAsync: true,
+	tags: ["otherwise"],
+	/**
+	 * @param {Node} target
+	 * @param {String} content
+	 */
+	_drawContent: function(target, content) {
+		if(content) {
+			const result = document.createDocumentFragment();
+		jQuery(result).wiki(content);
+			if(result.hasChildNodes()) {
+				target.parentNode.replaceChild(result, target);
+			}
+		}
+	},
+	handler: function() {
+		if(this.args.full.length === 0) {
+			return this.error('no promise expression specified');
+		}
+		if(this.payload.length > 2) {
+			return this.error('only one <<otherwise>> tag is allowed');
+		}
+		try {
+			/** @type {string} */
+			const content = this.payload[0].contents;
+			/** @type {string} */
+			const errorContent = this.payload.length > 1 ? this.payload[1].contents : undefined;
+			/** @type {string} */
+			const errorVar = this.payload.length > 1 ? this.payload[1].args.raw : undefined;
+			/** @type {Node} */
+			const target = document.createElement("when");
+			this.output.appendChild(target);
+			/** @type {(parent:Node, sibling?:ChildNode, content?:string) => void} */
+			const _drawContent = this.self._drawContent;
+			Promise.resolve(Scripting.evalJavaScript(this.args.full)).then(function() {
+				_drawContent(target, content);
+			}, function(error) {
+				if(errorVar) {
+					State.setVar(errorVar, error);
+				}
+				_drawContent(target, errorContent);
+			});
+		} catch(ex) {
+			return this.error(`bad evaluation: ${typeof ex === 'object' ? ex.message : ex}`);
+		}
+	}
+});
+window.InspectablePromise = InspectablePromise;</script><tw-passagedata pid="1" name="StoryInit" tags="" position="95,93" size="100,100">/* 
   * Many thanks to {G𝖜𝖊𝖓[♡].T𝖆𝖘𝖙𝖎𝖈} and Akjosch in the Twine Discord for all the coding help and finesse! 
   * Backgrounds c/o Unsplash images
   * Pixelation handled by: https://www.cssscript.com/demo/pixelate-images-canvas-pixasso/
@@ -593,6 +758,18 @@ window.Player = Player;</script><tw-passagedata pid="1" name="StoryInit" tags=""
 &lt;&lt;set $num_friends to 4&gt;&gt;\
 &lt;&lt;set $num_rooms to 20&gt;&gt;\
 &lt;&lt;set $current_room_id to 0&gt;&gt;\
+/*&lt;&lt;set $game to new Game({
+  name: &#39;The caves of slaughter&#39;,
+  map: map})&gt;&gt;\
+&lt;&lt;= $game.name&gt;&gt;\*/
+/*&lt;&lt;set $game_map to setup.map&gt;&gt;
+&lt;&lt;= $game_map[0][0].title&gt;&gt;*/
+
+
+
+
+
+
 \
 /* 
   Generate rooms 
@@ -605,7 +782,6 @@ window.Player = Player;</script><tw-passagedata pid="1" name="StoryInit" tags=""
  * Consider weirding some rooms up a bit due to spores
 */\
 \
-&lt;&lt;set $player to new Player(&quot;Erik&quot;)&gt;&gt;
 &lt;&lt;set $rooms to {}&gt;&gt;\
 &lt;&lt;set _friend_locations = Array.from({ length: $num_rooms }, (_, i) =&gt; i)&gt;&gt;\
 \
@@ -649,7 +825,10 @@ window.Player = Player;</script><tw-passagedata pid="1" name="StoryInit" tags=""
 \
 /* Generate enemies */\
 \
-\</tw-passagedata><tw-passagedata pid="2" name="Begin" tags="noinventory" position="299,98" size="100,100">You (&lt;&lt;= $player.name&gt;&gt;) and your three closest friends are out adventuring in the woods. (select names/pronouns). Character1 yells, &quot;hey, look [[over there|over there]]!&quot;</tw-passagedata><tw-passagedata pid="3" name="over there" tags="noinventory" position="301,249" size="100,100">You see the base of the mountain rising gently in the distance, its granite face gently reflecting the afternoon sun. A recent [[storm]] caused a small rockslide, revealing an [[opening]].
+\</tw-passagedata><tw-passagedata pid="2" name="Begin" tags="noinventory" position="299,98" size="100,100">&lt;&lt;when setup.traceryImport&gt;&gt;
+You (&lt;&lt;= $player.name&gt;&gt;) and your three closest friends are out adventuring in the woods. (select names/pronouns). Character1 yells, &quot;hey, look [[over there|over there]]!&quot;
+  &lt;&lt;= setup.map[0][0].title&gt;&gt;
+&lt;&lt;/when&gt;&gt;</tw-passagedata><tw-passagedata pid="3" name="over there" tags="noinventory" position="301,249" size="100,100">You see the base of the mountain rising gently in the distance, its granite face gently reflecting the afternoon sun. A recent [[storm]] caused a small rockslide, revealing an [[opening]].
 
 [[Skip | ProcGen]]</tw-passagedata><tw-passagedata pid="4" name="storm" tags="noinventory" position="151,399" size="100,100">A wild thunderstorm that produced high winds, golf-ball sized hail, and pounding rain. Your house, fortunately, was unaffected.  You end your musings and get [[back to playing|over there]].</tw-passagedata><tw-passagedata pid="5" name="opening" tags="noinventory" position="301,399" size="100,100">You approach the mountainside to get a better look at the newly-opened cave. In all the years that you played at the foot of the mountain, you never noticed that there might be more hiding in plain sight.
 
@@ -683,6 +862,11 @@ You are carrying:
 /* DRAW MAP AS A GRID OF CELLS? */
 &lt;div id=&quot;proc-content&quot;&gt;\
 \
+&lt;hr&gt;
+&lt;&lt;= $player.pos&gt;&gt;\
+&lt;&lt;= setup.map[0][0].title&gt;&gt;
+
+&lt;hr&gt;
 &lt;&lt;set _lid to String.format(&quot;room_{0}&quot;, $current_room_id)&gt;&gt;
 &lt;&lt;print $rooms[_lid][&quot;title&quot;]&gt;&gt;
 &lt;&lt;print $rooms[_lid][&quot;description&quot;]&gt;&gt;
