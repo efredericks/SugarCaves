@@ -411,7 +411,8 @@ img.full-width {
   border-radius: 25px;
   border: 2px solid #333;
 }
-</style><script role="script" id="twine-user-script" type="text/twine-javascript">const WIDTH = 10;
+</style><script role="script" id="twine-user-script" type="text/twine-javascript">/** GLOBALS **/
+const WIDTH = 10;
 const HEIGHT = 10;
 const ROOM_TYPES = {
 	NORMAL: 0,
@@ -424,9 +425,6 @@ const ROOM_TYPES = {
 	STALAGS: 7,
 };
 Object.freeze(ROOM_TYPES);
-
-var cave_map = null; // filled in by the Promise
-
 
 
 // Class that outlines a room
@@ -478,11 +476,8 @@ class Room {
 }
 
 
-
 // Import a script while saving the returned Promise so it may be used later
 setup.traceryImport = importScripts("js/tracery.js", "js/mods-eng-basic.js", "js/simplex-noise.js");
-	
-
 
 // Use the returned Promise later on to ensure that the script has been fully
 // loaded before executing dependent code
@@ -528,22 +523,6 @@ setup.traceryImport
 		console.log(err);
 });
 
-
-
-
-setup.demoTracery = function() {
-	var grammar = tracery.createGrammar({
-	"name": ["Arjun","Yuuma","Darcy","Mia","Chiaki","Izzi","Azra","Lina"],
-	"animal": ["unicorn","raven","sparrow","scorpion","coyote","eagle","owl","lizard","zebra","duck","kitten"],
-	"mood": ["vexed","indignant","impassioned","wistful","astute","courteous"],
-	"story": ["#hero# traveled with her pet #heroPet#.  #hero# was never #mood#, for the #heroPet# was always too #mood#."],
-	"origin": ["#[hero:#name#][heroPet:#animal#]story#"]
-  });
-	//grammar.addModifiers(baseEngModifiers);
-	
-	var story = grammar.flatten("#origin#");
-	return story;
-}
 
 /* Generate room information:
    * loop through each room and generate a 'tag'
@@ -596,108 +575,8 @@ class Player {
 }
 window.Player = Player;
 
-// Class that represents a game object
-class Game {
-  constructor(opts) {
-    this.name = '';
-		this.map  = null;
-				
-    /* call with a config object, overriding some or all of the above */
-    if(typeof opts === "object") {
-      Object.keys(opts).forEach(function (pn) {
-        this[pn] = clone(opts[pn]);
-      }, this);
-    }
-  }
-	get gameMap() {
-		return this.map;
-	}
-	clone() {
-    return new Game(this);
-  }
-  toJSON() {
-    var ownData = {};
-    Object.keys(this).forEach(function (pn) {
-      ownData[pn] = clone(this[pn]);
-    }, this);
-    return JSON.reviveWrapper('new Game($ReviveData$)', ownData);
-  }
-}
-window.Game = Game;
-
 /*************************/
 // c/o https://gist.github.com/Akjosch/baa4ff7b69795b91e2161688ba6d55ae
-/* This is a helper class, to make Promises you can easily pull the value from synchronously */
-
-const InspectablePromise = (function() {
-	var statusProp = Symbol("status");
-	var progressProp = Symbol("progress");
-	var valueProp = Symbol("value");
-	var reasonProp = Symbol("reason");
-
-	/**
-	 * Inspectable Promise
-	 */
-	class InspectablePromise extends Promise {
-		/**
-		 * @param {(resolve: (value: any) => void, reject: (reason: any) => void, progress: (progress: any) => void) => void} executor
-		 */
-		constructor(executor) {
-			var self;
-			super((resolve, reject) => {
-				executor(
-					(value) => {
-						if(self) {
-							self[statusProp] = "resolved";
-							self[valueProp] = value;
-							resolve(value);
-						} else {
-							setTimeout(() => {
-								self[statusProp] = "resolved";
-								self[valueProp] = value;
-								resolve(value);
-							}, 0);
-						}
-					},
-					(reason) => {
-						if(self) {
-							self[statusProp] = "rejected";
-							self[reasonProp] = reason;
-							reject(reason);
-						} else {
-							setTimeout(() => {
-								self[statusProp] = "rejected";
-								self[reasonProp] = reason;
-								reject(reason);
-							}, 0);
-						}
-					},
-					(progress) => {
-						if(self) {
-							self[progressProp] = progress;
-						} else {
-							setTimeout(() => { self[progressProp] = progress; }, 0);
-						}
-					}
-				);
-			});
-			self = this;
-			this[statusProp] = "pending";
-		}
-
-		get status() { return this[statusProp]; }
-		get pending() { return this[statusProp] === "pending"; }
-		get resolved() { return this[statusProp] === "resolved"; }
-		get rejected() { return this[statusProp] === "rejected"; }
-		get value() { return this[valueProp]; }
-		get reason() { return this[reasonProp]; }
-		get progress() { return this[progressProp]; }
-	}
-
-	return InspectablePromise;
-})();
-
-
 Macro.add("when", {
 	skipArgs: true,
 	isAsync: true,
@@ -746,8 +625,7 @@ Macro.add("when", {
 			return this.error(`bad evaluation: ${typeof ex === 'object' ? ex.message : ex}`);
 		}
 	}
-});
-window.InspectablePromise = InspectablePromise;</script><tw-passagedata pid="1" name="StoryInit" tags="" position="95,93" size="100,100">/* 
+});</script><tw-passagedata pid="1" name="StoryInit" tags="" position="95,93" size="100,100">/* 
   * Many thanks to {G𝖜𝖊𝖓[♡].T𝖆𝖘𝖙𝖎𝖈} and Akjosch in the Twine Discord for all the coding help and finesse! 
   * Backgrounds c/o Unsplash images
   * Pixelation handled by: https://www.cssscript.com/demo/pixelate-images-canvas-pixasso/
@@ -758,12 +636,7 @@ window.InspectablePromise = InspectablePromise;</script><tw-passagedata pid="1" 
 &lt;&lt;set $num_friends to 4&gt;&gt;\
 &lt;&lt;set $num_rooms to 20&gt;&gt;\
 &lt;&lt;set $current_room_id to 0&gt;&gt;\
-/*&lt;&lt;set $game to new Game({
-  name: &#39;The caves of slaughter&#39;,
-  map: map})&gt;&gt;\
-&lt;&lt;= $game.name&gt;&gt;\*/
-/*&lt;&lt;set $game_map to setup.map&gt;&gt;
-&lt;&lt;= $game_map[0][0].title&gt;&gt;*/
+
 
 
 
@@ -864,8 +737,18 @@ You are carrying:
 \
 &lt;hr&gt;
 &lt;&lt;= $player.pos&gt;&gt;\
-&lt;&lt;= setup.map[0][0].title&gt;&gt;
+&lt;h3&gt;&lt;&lt;= setup.map[$player.row][$player.col].title&gt;&gt;&lt;/h3&gt;
+&lt;div class=&quot;room-desc&quot;&gt;
+&lt;&lt;= setup.map[$player.row][$player.col].description&gt;&gt;
+&lt;/div&gt;
+&lt;&lt;link [[setup.map[$player.row+1][$player.col].title|ProcGen]]&gt;&gt;&lt;&lt;set $player.row += 1&gt;&gt;&lt;&lt;/link&gt;&gt;
+&lt;&lt;link [[setup.map[$player.row][$player.col+1].title|ProcGen]]&gt;&gt;&lt;&lt;set $player.col += 1&gt;&gt;&lt;&lt;/link&gt;&gt;
+&lt;&lt;link [[setup.map[$player.row+1][$player.col+1].title|ProcGen]]&gt;&gt;&lt;&lt;set $player.col += 1&gt;&gt;&lt;&lt;set $player.row += 1&gt;&gt;&lt;&lt;/link&gt;&gt;
 
+/*  [[setup.map[$player.row+1][$player.col].title|ProcGen][&lt;&lt;set $player.row=$player.row+1&gt;&gt;]]
+  [[setup.map[$player.row][$player.col+1].title|ProcGen][&lt;&lt;set $player.col=$player.col+1&gt;&gt;]]*/
+
+/*
 &lt;hr&gt;
 &lt;&lt;set _lid to String.format(&quot;room_{0}&quot;, $current_room_id)&gt;&gt;
 &lt;&lt;print $rooms[_lid][&quot;title&quot;]&gt;&gt;
@@ -881,17 +764,17 @@ You are carrying:
 \
 &lt;&lt;for _rid range $rooms[_lid].connectors&gt;&gt;\
   &lt;&lt;capture _rid&gt;&gt;\
-  
+  */
   /*
   &lt;&lt;link &quot;[+]&quot;&gt;&gt;&lt;&lt;set $pcStr++&gt;&gt;&lt;&lt;replace &quot;#stats-str&quot;&gt;&gt;&lt;&lt;print $pcStr&gt;&gt;&lt;&lt;/replace&gt;&gt;&lt;&lt;/link&gt;&gt;
   */
-  
+  /*
   
 	[[$rooms[&#96;room_${_rid}&#96;].title|ProcGen][$current_room_id = _rid]]
   &lt;&lt;/capture&gt;&gt;\
 &lt;&lt;/for&gt;&gt;\
 &lt;/div&gt;
-
+*/
 /*
 &lt;&lt;set _connectors = Array.from({length: $num_rooms}, (_, i) =&gt; i)&gt;&gt;
 ...
