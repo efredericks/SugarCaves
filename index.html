@@ -868,6 +868,7 @@ class Room {
 		this.encounters = new Array();
 		this.prior_room = -1;
 		this.connectors = new Array();
+		this.discovered = false;
 		
 		
 		if (noise_value < 0) {
@@ -941,6 +942,8 @@ setup.traceryImport
 		}
 		map[row] = t_row;
 	}
+	map[0][0].discovered = true;
+	
 	//window.GameMap = map;
 	setup.map = map;
 	setup.WIDTH = WIDTH;
@@ -1101,13 +1104,6 @@ Macro.add("when", {
 &lt;&lt;set $num_rooms to 20&gt;&gt;\
 &lt;&lt;set $current_room_id to 0&gt;&gt;\
 
-
-
-
-
-
-
-
 \
 /* 
   Generate rooms 
@@ -1200,11 +1196,12 @@ You have found &lt;&lt;print _found&gt;&gt; friends.
 You are carrying:
 &lt;&lt;/if&gt;&gt;\</tw-passagedata><tw-passagedata pid="11" name="empty cavern" tags="" position="497,654" size="100,100">Your friends are gone. You stand in an empty cavern studded with ancient stalagtites and stalagmites. A drip-drip-drip of water hitting a puddle can be heard off in the distance. No indication of violence can be seen. All you can do is search to [[find your friends | ProcGen]].</tw-passagedata><tw-passagedata pid="12" name="PassageFooter" tags="PassageFooter" position="675,33" size="100,100">&lt;hr&gt;\
 &lt;&lt;include inventory&gt;&gt;\
-&lt;&lt;include map&gt;&gt;\</tw-passagedata><tw-passagedata pid="13" name="ProcGen" tags="map" position="814,385" size="100,100">/* SEND OFF TO FUNCTION AND RETURN A TUPLE OF INFO? */\
+&lt;&lt;include map&gt;&gt;\</tw-passagedata><tw-passagedata pid="13" name="ProcGen" tags="map" position="815,387" size="100,100">/* SEND OFF TO FUNCTION AND RETURN A TUPLE OF INFO? */\
 /* DRAW MAP AS A GRID OF CELLS? */\
 &lt;div id=&quot;proc-content&quot;&gt;\
 \
 &lt;&lt;= $player.pos&gt;&gt;\
+&lt;&lt;set setup.map[$player.row][$player.col].discovered to true&gt;&gt;
 &lt;h3&gt;&lt;&lt;= setup.map[$player.row][$player.col].title&gt;&gt;&lt;/h3&gt;\
 &lt;div class=&quot;room-desc&quot;&gt;\
 &lt;&lt;= setup.map[$player.row][$player.col].description&gt;&gt;\
@@ -1264,8 +1261,32 @@ You are carrying:
 &lt;&lt;else&gt;&gt;
 &lt;&lt;=setup.friends[setup.currentChar].name&gt;&gt; is &lt;&lt;=setup.friends[setup.currentChar].age&gt;&gt; years old.  A bit older than you, but still fun to hang with at (place).
 &lt;&lt;/if&gt;&gt;
-&lt;&lt;back&gt;&gt;</tw-passagedata><tw-passagedata pid="16" name="map" tags="" position="851,29.5" size="100,100">/* draw a circle in each map cell and draw a line to it? */
+&lt;&lt;back&gt;&gt;</tw-passagedata><tw-passagedata pid="16" name="map" tags="" position="848,29.5" size="100,100">/* draw a circle in each map cell and draw a line to it? */
 &lt;&lt;if tags().includes(&quot;map&quot;)&gt;&gt;\
+&lt;&lt;script&gt;&gt;
+  var output = &quot;&lt;svg id=&#39;map_viz&#39; width=&#39;600&#39; height=&#39;200&#39; viewBox=&#39;0 0 100 100&#39; xmlns=&#39;http://www.w3.org/2000/svg&#39;&gt;&quot;;
+  output += &quot;&lt;rect width=&#39;600&#39; height=&#39;200&#39; fill=&#39;#f1f3f5&#39;/&gt;&quot;;
+
+  // Generate map
+  //var circles = Array();
+  var start_x = 32;
+  var start_y = 32;
+  
+  for (var row = 0; row &lt; setup.HEIGHT; row++) {
+    for (var col = 0; col &lt; setup.WIDTH; col++) {
+	  if (setup.map[row][col].discovered) {
+	    var c_x = Math.floor(start_x * col)+start_x;
+		var c_y = Math.floor(start_y * row)+start_y;
+	    output += &quot;&lt;circle cx=&#39;&quot; + c_x + &quot;&#39; cy=&#39;&quot; + c_y + &quot;&#39; r=&#39;15&#39; fill=&#39;#868e96&#39;/&gt;&quot;;
+	    //var c = &quot;&lt;circle cx=&#39;&quot; + c_x + &quot;&#39; cy=&#39;&quot; + c_y + &quot;&#39; r=&#39;20&#39;/&gt;&quot;;
+		//circles.push(c);
+	  }
+	}
+  }
+  output += &quot;&lt;/svg&gt;&quot;;
+  setup.map_viz = output;
+&lt;&lt;/script&gt;&gt;
+&lt;&lt;= setup.map_viz&gt;&gt;
 &lt;&lt;for _rid to 0; _rid lt setup.HEIGHT; _rid++&gt;&gt;\
   &lt;section class=&quot;map&quot;&gt;\
   &lt;&lt;for _cid to 0; _cid lt setup.WIDTH; _cid++&gt;&gt;\
