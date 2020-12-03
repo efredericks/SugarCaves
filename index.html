@@ -431,6 +431,9 @@ section.map > div > div {
   width: 50px; 
   display: inline-block;
   vertical-align: top;
+}
+div.active {
+  background: #ccc;
 }</style><script role="script" id="twine-user-script" type="text/twine-javascript">/** GLOBALS **/
 const NUM_FRIENDS = 4;
 const WIDTH = 10;
@@ -1261,14 +1264,21 @@ You are carrying:
 &lt;&lt;else&gt;&gt;
 &lt;&lt;=setup.friends[setup.currentChar].name&gt;&gt; is &lt;&lt;=setup.friends[setup.currentChar].age&gt;&gt; years old.  A bit older than you, but still fun to hang with at (place).
 &lt;&lt;/if&gt;&gt;
-&lt;&lt;back&gt;&gt;</tw-passagedata><tw-passagedata pid="16" name="map" tags="" position="852,31.5" size="100,100">&lt;&lt;if tags().includes(&quot;map&quot;)&gt;&gt;\
+&lt;&lt;back&gt;&gt;</tw-passagedata><tw-passagedata pid="16" name="map" tags="" position="851,29.5" size="100,100">/* draw a circle in each map cell and draw a line to it? */
+&lt;&lt;if tags().includes(&quot;map&quot;)&gt;&gt;\
 &lt;&lt;for _rid to 0; _rid lt setup.HEIGHT; _rid++&gt;&gt;\
   &lt;section class=&quot;map&quot;&gt;\
   &lt;&lt;for _cid to 0; _cid lt setup.WIDTH; _cid++&gt;&gt;\
     &lt;&lt;capture _rid, _cid&gt;&gt;\
-	  &lt;div&gt;&lt;div&gt;\
-        &lt;&lt;link [[*|ProcGen]]&gt;&gt;&lt;&lt;set $player.row to _rid&gt;&gt;&lt;&lt;set $player.col to _cid&gt;&gt;&lt;&lt;/link&gt;&gt;\
+	&lt;&lt;if $player.row eq _rid and $player.col eq _cid&gt;&gt;\
+	  &lt;div&gt;&lt;div class=&#39;active&#39;&gt;
+	    &lt;&lt;link [[*|ProcGen]]&gt;&gt;&lt;&lt;set $player.row to _rid&gt;&gt;&lt;&lt;set $player.col to _cid&gt;&gt;&lt;&lt;/link&gt;&gt;\
 	  &lt;/div&gt;&lt;/div&gt;\
+    &lt;&lt;else&gt;&gt;
+	  &lt;div&gt;&lt;div&gt;
+	    &lt;&lt;link [[*|ProcGen]]&gt;&gt;&lt;&lt;set $player.row to _rid&gt;&gt;&lt;&lt;set $player.col to _cid&gt;&gt;&lt;&lt;/link&gt;&gt;\
+	  &lt;/div&gt;&lt;/div&gt;\
+	&lt;&lt;/if&gt;&gt;	  
     &lt;&lt;/capture&gt;&gt;\
   &lt;&lt;/for&gt;&gt;\
   &lt;/section&gt;\
