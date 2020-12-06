@@ -1,0 +1,300 @@
+:: StoryTitle
+SugarCaves
+
+:: StoryData
+{
+	"ifid": "F891172E-6C06-4CAC-AD88-C267809FEFD2",
+	"format": "SugarCube",
+	"format-version": "2.31.1",
+	"start": "Begin",
+	"zoom": 1
+}
+
+:: Story Stylesheet [stylesheet]
+/* $ tweego -o index.html SugarCaves.twee styles scripts */
+
+:: Story JavaScript [script]
+/* js/constants.js, js/room.js, js/traceryGen.js, js/person.js, js/macroWhen.js */
+
+
+:: StoryInit {"position":"95,93","size":"100,100"}
+/* 
+  * Many thanks to {G𝖜𝖊𝖓[♡].T𝖆𝖘𝖙𝖎𝖈} and Akjosch in the Twine Discord for all the coding help and finesse! 
+  * Backgrounds c/o Unsplash images
+  * Pixelation handled by: https://www.cssscript.com/demo/pixelate-images-canvas-pixasso/
+
+*/
+/* Globals */\
+<<set $player to new Player("Erik")>>
+<<set $num_friends to 4>>\
+<<set $num_rooms to 20>>\
+<<set $current_room_id to 0>>\
+
+\
+/* 
+  Generate rooms 
+    * Every room has [4] possible connectors, but not required
+	* Ideally, the prose will flow from one to another
+	  * e.g., if a stream starts in one, it will trickle into the others
+	  * Perhaps consider elevation?  That might help...
+	  
+ * Consider random events
+ * Consider weirding some rooms up a bit due to spores
+*/\
+\
+<<set $rooms to {}>>\
+<<set _friend_locations = Array.from({ length: $num_rooms }, (_, i) => i)>>\
+\
+/* Initialize rooms, then connect them */
+<<for _i to 0; _i lt $num_rooms; _i++>>\
+  <<set _lid to String.format("room_{0}", _i)>>\
+  <<set _title to String.format("Room_{0}'s Title", _i)>>\
+  <<set _desc to String.format("Room_{0}'s Description", _i)>>\
+  <<set $rooms[_lid] to {"title": _title, "description": _desc, "connectors": []}>>\
+<</for>>\
+<<for _i to 0; _i lt $num_rooms; _i++>>\
+  /* Get random number of connectors */\
+  <<set _num_conns to random(1,4)>>\
+  <<set _connectors = Array.from({ length: $num_rooms }, (_, i) => i)>>\
+  <<set _l_connectors_rem to _connectors.delete(_i)>>
+  <<set _lid to String.format("room_{0}", _i)>>\
+  <<set $rooms[_lid].connectors to _connectors.pluckMany(_num_conns)>>\
+<</for>>\
+\
+\
+/* Generate friends */\
+<<set $friends to []>>\
+<<set $friend_set_locations to _friend_locations.pluckMany(4)>>\
+<<for _i to 0; _i lt $num_friends; _i++>>\
+  <<set _name to String.format("Friend_{0}", _i)>>\
+  <<set $friends[_i] to {"name": _name, 
+     "location": $friend_set_locations[_i],
+	 "found": false}>>\
+<</for>>\
+\
+\
+\
+/* Generate inventory */\
+/* TODO: add random stuff? */\
+<<set $inventory to {"cellphone": true, "flashlight": false}>>\
+<<set $cellphone to {"number": "867-5309",
+                     "charge": 95,
+					 "flashlight": "off"}>>\
+<<set $flashlight to {"status": "on", "battery": 100}>>\
+\
+\
+/* Generate enemies */\
+\
+\
+
+
+:: Begin [noinventory] {"position":"299,98","size":"100,100"}
+<<when setup.traceryImport>>
+You (<<= $player.name>>) and your four closest friends (<<link [[setup.friends[0].name|CharacterInfo]]>><<set setup.currentChar to 0>><</link>>, <<link [[setup.friends[1].name|CharacterInfo]]>><<set setup.currentChar to 1>><</link>>, <<link [[setup.friends[2].name|CharacterInfo]]>><<set setup.currentChar to 2>><</link>>, and <<link [[setup.friends[3].name|CharacterInfo]]>><<set setup.currentChar to 3>><</link>>) are out adventuring in the woods. <<= setup.friends[0].name>> yells, "hey, look [[over there|over there]]!"
+
+
+<</when>>
+
+
+:: over there [noinventory] {"position":"301,249","size":"100,100"}
+You see the base of the mountain rising gently in the distance, its granite face gently reflecting the afternoon sun. A recent [[storm]] caused a small rockslide, revealing an [[opening]].
+
+[[Skip | ProcGen]]
+
+
+:: storm [noinventory] {"position":"151,399","size":"100,100"}
+A wild thunderstorm that produced high winds, golf-ball sized hail, and pounding rain. Your house, fortunately, was unaffected.  You end your musings and get [[back to playing|over there]].
+
+
+:: opening [noinventory] {"position":"301,399","size":"100,100"}
+You approach the mountainside to get a better look at the newly-opened cave. In all the years that you played at the foot of the mountain, you never noticed that there might be more hiding in plain sight.
+
+The cave opening is irregularly-shaped, rocky outcroppings studding its edges. It is dark but [[passable]].
+
+
+:: passable [noinventory] {"position":"499,265","size":"100,100"}
+You and your friends pierce the darkness and adventure in. <<link [[setup.friends[setup.flashlightFriend].name|CharacterInfo]]>><<set setup.currentChar to setup.flashlightFriend>><</link>> clicks on the [[flashlight]] and sweeps the beam across. The light shines down a dark tunnel, illuminating dust that has been disturbed by your entry.
+
+Nothing crosses your beam, however the tunnel appears to go on and on [[and on]].
+
+
+:: flashlight {"position":"1024,163","size":"100,100"}
+A standard Maglite with a fancy battery level indicator.  It is currently <<print $flashlight["status"]>> with <<print $flashlight["battery"]>>% power remaining.  
+
+<<back>>
+
+
+:: and on [noinventory] {"position":"490,398","size":"100,100"}
+\
+<<set $flashlight["status"] = "off">>\
+\
+The four of you venture deeper into the cave. The [[flashlight]] beam winks out as <<link [[setup.friends[setup.flashlightFriend].name|CharacterInfo]]>><<set setup.currentChar to setup.flashlightFriend>><</link>> stumbles and utters a sharp curse.
+
+[[Silence]].
+
+
+:: Silence {"position":"493,530","size":"100,100"}
+<<set $flashlight["status"] = "on">>\
+<<set $inventory["flashlight"] = true>>\
+\
+In the distance you hear a shrill scream, fluttering, silence. You look down and notice the glint of the [[flashlight]]. You pick it up and add it to your [[inventory]].
+
+You click the [[flashlight]] on and are relieved to see the beam at full strength, illuminating the [[empty cavern]].
+
+
+:: inventory {"position":"1029,43","size":"100,100"}
+<<if not tags().includes("noinventory")>>\
+<<set _found to 0>>\
+<<for _i to 0; _i lt $num_friends; _i++>>\
+  <<if $friends[_i]["found"] eq true>>\
+    <<set _found = _found + 1>>\
+  <</if>>\
+<</for>>\
+<<if _found eq 1>>\
+You have found 1 friend.
+<<else>>\
+You have found <<print _found>> friends.
+<</if>>\
+You are carrying:
+<</if>>\
+
+
+:: empty cavern {"position":"497,654","size":"100,100"}
+Your friends are gone. You stand in an empty cavern studded with ancient stalagtites and stalagmites. A drip-drip-drip of water hitting a puddle can be heard off in the distance. No indication of violence can be seen. All you can do is search to [[find your friends | ProcGen]].
+
+
+:: PassageFooter [PassageFooter] {"position":"675,33","size":"100,100"}
+<hr>\
+<<include inventory>>\
+<<include map>>\
+
+
+:: ProcGen [map] {"position":"815,386","size":"100,100"}
+/* SEND OFF TO FUNCTION AND RETURN A TUPLE OF INFO? */\
+/* DRAW MAP AS A GRID OF CELLS? */\
+<<set setup.map[$player.row][$player.col].discovered to true>>
+<h3><<= setup.map[$player.row][$player.col].title>></h3>\
+<div class="room-desc">\
+<<= setup.map[$player.row][$player.col].description>>\
+</div>
+
+<div id="proc-content">\
+\
+<<= $player.pos>>\
+
+<<for _i to 0; _i lt $player.possibleMoves.length; _i++>>
+  <<set _newRow to $player.possibleMoves[_i][0]>>\
+  <<set _newCol to $player.possibleMoves[_i][1]>>\
+  <<set _newDIR to $player.possibleMoves[_i][2]>>\
+  <<= _newRow>>x<<= _newCol>><<= _newDIR>><<link [[setup.map[_newRow][_newCol].title|ProcGen]]>>
+    <<set $player.last_row = $player.row>>
+    <<set $player.last_col = $player.col>>
+    <<set $player.row = _newRow>>
+    <<set $player.col = _newCol>>
+  <</link>>
+<</for>>
+<<link [[TEST_E|ProcGen]]>>
+  <<set $player.col = $player.col += 1>>
+  <<set $player.last_row = $player.row>>
+  <<set $player.last_col = $player.col>>   
+<</link>>
+<<link [[TEST_SE|ProcGen]]>>
+  <<set $player.row = $player.row += 1>>
+  <<set $player.col = $player.col += 1>>
+  <<set $player.last_row = $player.row>>
+  <<set $player.last_col = $player.col>>   
+<</link>>
+<<link [[TEST_S|ProcGen]]>>
+  <<set $player.row = $player.row += 1>>
+  <<set $player.last_row = $player.row>>
+  <<set $player.last_col = $player.col>>   
+<</link>>
+<<link [[TEST_SW|ProcGen]]>>
+  <<set $player.row = $player.row += 1>>
+  <<set $player.col = $player.col -= 1>>
+  <<set $player.last_row = $player.row>>
+  <<set $player.last_col = $player.col>>   
+<</link>>
+<<link [[TEST_W|ProcGen]]>>
+  <<set $player.col = $player.col -= 1>>
+  <<set $player.last_row = $player.row>>
+  <<set $player.last_col = $player.col>>   
+<</link>>
+<<link [[GO BACK|ProcGen]]>>
+  <<set $player.col = $player.last_col>>
+  <<set $player.row = $player.last_row>>
+<</link>>
+</div>
+
+
+:: PassageHeader [PassageHeader] {"position":"565,36","size":"100,100"}
+<div id="back"></div>\
+<div id="front"></div>\
+\
+<div id="info"></div>
+
+
+:: CharacterInfo {"position":"1026,280","size":"100,100"}
+<h3><<=setup.friends[setup.currentChar].name>></h3>
+<<=setup.friends[setup.currentChar].description>>
+
+<<if $player.age gt setup.friends[setup.currentChar].age>>
+<<=setup.friends[setup.currentChar].name>> is <<=setup.friends[setup.currentChar].age>> years old, a friend you met on the (playground/tracery hook).
+<<elseif $player.age eq setup.friends[setup.currentChar].age>>
+<<=setup.friends[setup.currentChar].name>> is <<=setup.friends[setup.currentChar].age>> years old, the same age as you.  You hang out together at (recess/math/etc.).
+<<else>>
+<<=setup.friends[setup.currentChar].name>> is <<=setup.friends[setup.currentChar].age>> years old.  A bit older than you, but still fun to hang with at (place).
+<</if>>
+<<back>>
+
+
+:: map {"position":"848,27","size":"100,100"}
+/* draw a circle in each map cell and draw a line to it? */
+<<if tags().includes("map")>>\
+<<script>>
+  var output = "<svg id='map_viz' width='600' height='200' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'>";
+  output += "<rect width='600' height='200' fill='#f1f3f5'/>";
+
+  // Generate map
+  //var circles = Array();
+  var start_x = 32;
+  var start_y = 32;
+  
+  for (var row = 0; row < setup.HEIGHT; row++) {
+    for (var col = 0; col < setup.WIDTH; col++) {
+	  if (setup.map[row][col].discovered) {
+	    var c_x = Math.floor(start_x * col)+start_x;
+		var c_y = Math.floor(start_y * row)+start_y;
+	    output += "<circle cx='" + c_x + "' cy='" + c_y + "' r='15' fill='#868e96'/>";
+	    //var c = "<circle cx='" + c_x + "' cy='" + c_y + "' r='20'/>";
+		//circles.push(c);
+	  }
+	}
+  }
+  output += "</svg>";
+  setup.map_viz = output;
+<</script>>
+<<= setup.map_viz>>
+<<for _rid to 0; _rid lt setup.HEIGHT; _rid++>>\
+  <section class="map">\
+  <<for _cid to 0; _cid lt setup.WIDTH; _cid++>>\
+    <<capture _rid, _cid>>\
+	<<if $player.row eq _rid and $player.col eq _cid>>\
+	  <div><div class='active'>
+	    <<link [[*|ProcGen]]>><<set $player.row to _rid>><<set $player.col to _cid>><</link>>\
+	  </div></div>\
+	<<elseif setup.map[_rid][_cid].blocked is true>>
+	  <div><div class='blocked'>
+	  </div></div>
+    <<else>>
+	  <div><div>
+	    <<link [[*|ProcGen]]>><<set $player.row to _rid>><<set $player.col to _cid>><</link>>\
+	  </div></div>\
+	<</if>>	  
+    <</capture>>\
+  <</for>>\
+  </section>\
+<</for>>\
+<</if>>\
+
+
