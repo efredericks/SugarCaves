@@ -3,35 +3,34 @@ setup.traceryImport = importScripts("js/tracery.js", "js/mods-eng-basic.js", "js
 
 // Use the returned Promise later on to ensure that the script has been fully
 // loaded before executing dependent code
-setup.traceryImport
-	.then(function () {
-	  var rules = {
-"origin":["[myPlace:#path#]#line#"],
-"line":["#stream.a.capitalize#"],
-"nearby":["beyond the #path#", "far away", "ahead", "behind me"],
-"substance":["light", "reflections", "mist", "shadow", "darkness", "brightness", "gaiety", "merriment"],
-"mood":["overcast", "alight", "clear", "darkened", "blue", "shadowed", "illuminated", "silver", "cool", "warm", "summer-warmed"],
-"path":["path", "rock", "cavern wall", "underfoot", "stalagmites"],
-"move":["spiral", "twirl", "curl", "dance", "twine", "weave", "meander", "wander", "flow"],
-"stream": ["#stream-type# #stream-verb.s# #nearby#"],
-"stream-type": ["#stream-size# of #stream-adjective# water"],
-"stream-size": ["ribbon", "trickle", "rivulet", "stream"],
-"stream-adjective": ["clear, cool", "muddy", "cloudy", "iron-tinged"],
-"stream-verb": ["burble", "tinkle", "meander", "gush", "cut", "twirl", "curl", "dance", "twine", "flow"]
-};
+setup.traceryImport.then(function () {
+ var rules = {
+    "origin":["[myPlace:#path#]#line#"],
+    "line":["#stream.a.capitalize#"],
+    "nearby":["beyond the #path#", "far away", "ahead", "behind me"],
+    "substance":["light", "reflections", "mist", "shadow", "darkness", "brightness", "gaiety", "merriment"],
+    "mood":["overcast", "alight", "clear", "darkened", "blue", "shadowed", "illuminated", "silver", "cool", "warm", "summer-warmed"],
+    "path":["path", "rock", "cavern wall", "underfoot", "stalagmites"],
+    "move":["spiral", "twirl", "curl", "dance", "twine", "weave", "meander", "wander", "flow"],
+    "stream": ["#stream-type# #stream-verb.s# #nearby#"],
+    "stream-type": ["#stream-size# of #stream-adjective# water"],
+    "stream-size": ["ribbon", "trickle", "rivulet", "stream"],
+    "stream-adjective": ["clear, cool", "muddy", "cloudy", "iron-tinged"],
+    "stream-verb": ["burble", "tinkle", "meander", "gush", "cut", "twirl", "curl", "dance", "twine", "flow"]
+  };
 
   var grammar = tracery.createGrammar(rules);
   
-	/* Generate map */
-	var simplex = new SimplexNoise();
+  /* Generate map */
+  var simplex = new SimplexNoise();
 	var map = new Array(HEIGHT);
-	for (var row = 0; row < HEIGHT; row++) {
-		var t_row = new Array(WIDTH);
-		for (var col = 0; col < WIDTH; col++) {
-			t_row[col] = new Room("title " + row + "," + col, "desc", simplex.noise2D(col, row));
-		}
-		map[row] = t_row;
-	}
+  for (var row = 0; row < HEIGHT; row++) {
+	  var t_row = new Array(WIDTH);
+    for (var col = 0; col < WIDTH; col++) {
+      t_row[col] = new Room("title " + row + "," + col, "desc", simplex.noise2D(col, row));
+    }
+    map[row] = t_row;
+  }
 	
 	// Now carve out a path with a drunkard's walk from one corner to the other
 	var done = false;
@@ -129,16 +128,13 @@ setup.traceryImport
 	setup.flashlightFriend = randomInt(0, NUM_FRIENDS);
   setup.friends[setup.flashlightFriend].inventory['flashlight'] = true;
 	
-	
 	console.log(setup.friends);
 	setup.currentChar = "TBD"; // set a global to make loading in the passage easier
-	
 	
 	grammar.addModifiers(baseEngModifiers);
 	var story = grammar.flatten("#origin#");
 	document.getElementById('info').innerHTML = "<h3>Tracery Demo</h3><p style='border:1px solid red;'>" + story + "</p>";
-	})
-.catch(function (err) {
-		// There was an error loading the script, log it to the console.
-		console.log(err);
+}).catch(function (err) {
+  // There was an error loading the script, log it to the console.
+  console.log(err);
 });

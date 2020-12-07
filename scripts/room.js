@@ -1,16 +1,17 @@
 // Class that outlines a room
 class Room {
 	constructor (title, description, noise_value) {
-		this.title = title;
+		this.title       = title;
 		this.description = description;
 		this.noise_value = noise_value;
-		this.items = new Array();
-		this.encounters = new Array();
-		this.prior_room = -1;
-		this.connectors = new Array();
-		this.discovered = false;
-		this.blocked    = true;
+		this.items       = new Array();
+		this.encounters  = new Array();
+		this.prior_room  = -1;
+		this.connectors  = new Array();
+		this.discovered  = false;
+		this.blocked     = true;
 		
+		/* Generate room type from Simplex noise */
 		if (noise_value < 0) {
 			this.room_type = ROOM_TYPES.NORMAL;
 		 	this.title = "A normal room";
