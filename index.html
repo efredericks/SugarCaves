@@ -1136,7 +1136,7 @@ setup.drawMap = function(_map, _player) {
   for (let _row = 0; _row < _map.length; _row++) {
     _render += "<tr>";
     for (let _col = 0; _col < _map[_row].length; _col++) {
-      _render += `<td style="background-color: ${(_map[_row][_col].blocked ? "#666": "#444")};"> ${(_player.col == _col && _player.row == _row ? "P" : "" )}</td>`;
+      _render += `<td style="background-color: ${(_map[_row][_col].blocked ? "#666": "#444")};"> ${(_player.col == _col && _player.row == _row ? "😐" : "" )}</td>`;
     }
     _render += "</tr>";
   }
@@ -1397,9 +1397,9 @@ You are carrying:
 &lt;h3&gt;&lt;&lt;= setup.map[$player.row][$player.col].title&gt;&gt;&lt;/h3&gt;\
 &lt;div class=&quot;room-desc&quot;&gt;\
 &lt;&lt;= setup.map[$player.row][$player.col].description&gt;&gt;\
-&lt;/div&gt;
-
-
+&lt;/div&gt;\
+\
+\
 &lt;div id=&quot;proc-content&quot;&gt;\
 \
 \
@@ -1410,12 +1410,12 @@ You are carrying:
     &lt;&lt;set _newCol to _validMoves[_i][1]&gt;&gt;\
     &lt;&lt;set _temp_title to String(_newRow) + &quot;:&quot; + String(_newCol) + &quot;::&quot; + setup.map[_newRow][_newCol].title&gt;&gt;\
     /*&lt;&lt;link [[setup.map[_newRow][_newCol].title|ProcGen]]&gt;&gt;*/
-    &lt;&lt;link [[_temp_title|ProcGen]]&gt;&gt;
-      &lt;&lt;set $player.last_row = $player.row&gt;&gt;
-      &lt;&lt;set $player.last_col = $player.col&gt;&gt;
-      &lt;&lt;set $player.row = _newRow&gt;&gt;
-      &lt;&lt;set $player.col = _newCol&gt;&gt;
-    &lt;&lt;/link&gt;&gt;
+    &lt;&lt;link [[_temp_title|ProcGen]]&gt;&gt;\
+      &lt;&lt;set $player.last_row = $player.row&gt;&gt;\
+      &lt;&lt;set $player.last_col = $player.col&gt;&gt;\
+      &lt;&lt;set $player.row = _newRow&gt;&gt;\
+      &lt;&lt;set $player.col = _newCol&gt;&gt;\
+    &lt;&lt;/link&gt;&gt;\
   &lt;&lt;/capture&gt;&gt;\
 &lt;&lt;/for&gt;&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="14" name="PassageHeader" tags="PassageHeader" position="475,225" size="100,100">&lt;div id=&quot;back&quot;&gt;&lt;/div&gt;\

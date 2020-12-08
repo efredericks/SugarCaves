@@ -117,9 +117,9 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
 <h3><<= setup.map[$player.row][$player.col].title>></h3>\
 <div class="room-desc">\
 <<= setup.map[$player.row][$player.col].description>>\
-</div>
-
-
+</div>\
+\
+\
 <div id="proc-content">\
 \
 \
@@ -130,12 +130,12 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
     <<set _newCol to _validMoves[_i][1]>>\
     <<set _temp_title to String(_newRow) + ":" + String(_newCol) + "::" + setup.map[_newRow][_newCol].title>>\
     /*<<link [[setup.map[_newRow][_newCol].title|ProcGen]]>>*/
-    <<link [[_temp_title|ProcGen]]>>
-      <<set $player.last_row = $player.row>>
-      <<set $player.last_col = $player.col>>
-      <<set $player.row = _newRow>>
-      <<set $player.col = _newCol>>
-    <</link>>
+    <<link [[_temp_title|ProcGen]]>>\
+      <<set $player.last_row = $player.row>>\
+      <<set $player.last_col = $player.col>>\
+      <<set $player.row = _newRow>>\
+      <<set $player.col = _newCol>>\
+    <</link>>\
   <</capture>>\
 <</for>>
 </div>
