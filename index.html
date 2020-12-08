@@ -440,6 +440,12 @@ div.active {
 }
 div.blocked {
   background: red;
+}
+
+td {
+  width: 20px;
+  height: 20px;
+  text-align: center;
 }</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
 /* js/constants.js, js/room.js, js/traceryGen.js, js/person.js, js/macroWhen.js */
 /* twine-user-script #2: "constants.js" */
@@ -930,6 +936,7 @@ setup.checkValidMoves = function(_map, _row, _col) {
 	for (var _r = up_row; _r <= down_row; _r++) {
 		for (var _c = left_col; _c <= right_col; _c++) {
 			if ((!(_map[_r][_c].blocked)) && ((_r != _row) || (_c != _col)))
+			// try this next time: if (!_map[_r][_c].blocked && !(_r === _row && _c === _col))
           moves.push([_r, _c]);
 		}
 	}
@@ -1123,6 +1130,20 @@ class Person {
 }
 window.Player = Person;
 /* twine-user-script #5: "room.js" */
+// move this elsewhere eventually
+setup.drawMap = function(_map, _player) {
+  let _render = "<table>";
+  for (let _row = 0; _row < _map.length; _row++) {
+    _render += "<tr>";
+    for (let _col = 0; _col < _map[_row].length; _col++) {
+      _render += `<td style="background-color: ${(_map[_row][_col].blocked ? "#666": "#444")};"> ${(_player.col == _col && _player.row == _row ? "P" : "" )}</td>`;
+    }
+    _render += "</tr>";
+  }
+	_render += "</table>";
+	return _render;
+}
+
 // Class that outlines a room
 class Room {
 	constructor (title, description, noise_value) {
@@ -1381,74 +1402,22 @@ You are carrying:
 
 &lt;div id=&quot;proc-content&quot;&gt;\
 \
-
-&lt;&lt;set _validMoves to setup.checkValidMoves(setup.map, $player.row, $player.col)&gt;&gt;
-&lt;&lt;for _i to 0; _i lt _validMoves.length; _i++&gt;&gt;
-(\
-&lt;&lt;= _validMoves[_i][0]&gt;&gt;\
-x\
-&lt;&lt;= _validMoves[_i][1]&gt;&gt;\
-)
+\
+&lt;&lt;set _validMoves to setup.checkValidMoves(setup.map, $player.row, $player.col)&gt;&gt;\
+&lt;&lt;for _i to 0; _i lt _validMoves.length; _i++&gt;&gt;\
+  &lt;&lt;capture _i, $player, _newRow, _newCol&gt;&gt;\
+    &lt;&lt;set _newRow to _validMoves[_i][0]&gt;&gt;\
+    &lt;&lt;set _newCol to _validMoves[_i][1]&gt;&gt;\
+    &lt;&lt;set _temp_title to String(_newRow) + &quot;:&quot; + String(_newCol) + &quot;::&quot; + setup.map[_newRow][_newCol].title&gt;&gt;\
+    /*&lt;&lt;link [[setup.map[_newRow][_newCol].title|ProcGen]]&gt;&gt;*/
+    &lt;&lt;link [[_temp_title|ProcGen]]&gt;&gt;
+      &lt;&lt;set $player.last_row = $player.row&gt;&gt;
+      &lt;&lt;set $player.last_col = $player.col&gt;&gt;
+      &lt;&lt;set $player.row = _newRow&gt;&gt;
+      &lt;&lt;set $player.col = _newCol&gt;&gt;
+    &lt;&lt;/link&gt;&gt;
+  &lt;&lt;/capture&gt;&gt;\
 &lt;&lt;/for&gt;&gt;
-/*&lt;&lt;= $player.pos&gt;&gt;\*/
-/* 
-&lt;&lt;for _i to 0; _i lt $player.checkMoves.length; _i++&gt;&gt;
-(&lt;&lt;= $player.checkMoves[_i][0]&gt;&gt;\
-&lt;&lt;= $player.checkMoves[_i][1]&gt;&gt;)
-&lt;&lt;link [[_i|ProcGen]]&gt;&gt;
-  &lt;&lt;set $player.last_row = $player.row&gt;&gt;
-  &lt;&lt;set $player.last_col = $player.col&gt;&gt;   
-  &lt;&lt;set $player.row = $player.checkMoves[_i][0]&gt;&gt;
-  &lt;&lt;set $player.col = $player.checkMoves[_i][1]&gt;&gt;
-&lt;&lt;/link&gt;&gt;
--
-&lt;&lt;/for&gt;&gt;
-*/
-
-/*
-&lt;&lt;for _i to 0; _i lt $player.possibleMoves.length; _i++&gt;&gt;
-  &lt;&lt;set _newRow to $player.possibleMoves[_i][0]&gt;&gt;\
-  &lt;&lt;set _newCol to $player.possibleMoves[_i][1]&gt;&gt;\
-  &lt;&lt;set _newDIR to $player.possibleMoves[_i][2]&gt;&gt;\
-  &lt;&lt;= _newRow&gt;&gt;x&lt;&lt;= _newCol&gt;&gt;&lt;&lt;= _newDIR&gt;&gt;&lt;&lt;link [[setup.map[_newRow][_newCol].title|ProcGen]]&gt;&gt;
-    &lt;&lt;set $player.last_row = $player.row&gt;&gt;
-    &lt;&lt;set $player.last_col = $player.col&gt;&gt;
-    &lt;&lt;set $player.row = _newRow&gt;&gt;
-    &lt;&lt;set $player.col = _newCol&gt;&gt;
-  &lt;&lt;/link&gt;&gt;
-&lt;&lt;/for&gt;&gt;
-&lt;&lt;link [[test_e|procgen]]&gt;&gt;
-  &lt;&lt;set $player.col = $player.col += 1&gt;&gt;
-  &lt;&lt;set $player.last_row = $player.row&gt;&gt;
-  &lt;&lt;set $player.last_col = $player.col&gt;&gt;   
-&lt;&lt;/link&gt;&gt;
-&lt;&lt;link [[TEST_SE|ProcGen]]&gt;&gt;
-  &lt;&lt;set $player.row = $player.row += 1&gt;&gt;
-  &lt;&lt;set $player.col = $player.col += 1&gt;&gt;
-  &lt;&lt;set $player.last_row = $player.row&gt;&gt;
-  &lt;&lt;set $player.last_col = $player.col&gt;&gt;   
-&lt;&lt;/link&gt;&gt;
-&lt;&lt;link [[TEST_S|ProcGen]]&gt;&gt;
-  &lt;&lt;set $player.row = $player.row += 1&gt;&gt;
-  &lt;&lt;set $player.last_row = $player.row&gt;&gt;
-  &lt;&lt;set $player.last_col = $player.col&gt;&gt;   
-&lt;&lt;/link&gt;&gt;
-&lt;&lt;link [[TEST_SW|ProcGen]]&gt;&gt;
-  &lt;&lt;set $player.row = $player.row += 1&gt;&gt;
-  &lt;&lt;set $player.col = $player.col -= 1&gt;&gt;
-  &lt;&lt;set $player.last_row = $player.row&gt;&gt;
-  &lt;&lt;set $player.last_col = $player.col&gt;&gt;   
-&lt;&lt;/link&gt;&gt;
-&lt;&lt;link [[TEST_W|ProcGen]]&gt;&gt;
-  &lt;&lt;set $player.col = $player.col -= 1&gt;&gt;
-  &lt;&lt;set $player.last_row = $player.row&gt;&gt;
-  &lt;&lt;set $player.last_col = $player.col&gt;&gt;   
-&lt;&lt;/link&gt;&gt;
-&lt;&lt;link [[GO BACK|ProcGen]]&gt;&gt;
-  &lt;&lt;set $player.col = $player.last_col&gt;&gt;
-  &lt;&lt;set $player.row = $player.last_row&gt;&gt;
-&lt;&lt;/link&gt;&gt;
-*/
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="14" name="PassageHeader" tags="PassageHeader" position="475,225" size="100,100">&lt;div id=&quot;back&quot;&gt;&lt;/div&gt;\
 &lt;div id=&quot;front&quot;&gt;&lt;/div&gt;\
 \
@@ -1464,6 +1433,19 @@ x\
 &lt;&lt;/if&gt;&gt;
 &lt;&lt;back&gt;&gt;</tw-passagedata><tw-passagedata pid="16" name="map" tags="" position="725,225" size="100,100">/* draw a circle in each map cell and draw a line to it? */
 &lt;&lt;if tags().includes(&quot;map&quot;)&gt;&gt;\
+&lt;div id=&quot;table_map&quot;&gt;
+&lt;&lt;= setup.drawMap(setup.map, $player)&gt;&gt;
+&lt;/div&gt;
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
 &lt;&lt;script&gt;&gt;
   var output = &quot;&lt;svg id=&#39;map_viz&#39; width=&#39;600&#39; height=&#39;200&#39; viewBox=&#39;0 0 100 100&#39; xmlns=&#39;http://www.w3.org/2000/svg&#39;&gt;&quot;;
   output += &quot;&lt;rect width=&#39;600&#39; height=&#39;200&#39; fill=&#39;#f1f3f5&#39;/&gt;&quot;;
@@ -1475,19 +1457,18 @@ x\
   
   for (var row = 0; row &lt; setup.HEIGHT; row++) {
     for (var col = 0; col &lt; setup.WIDTH; col++) {
-	  if (setup.map[row][col].discovered) {
-	    var c_x = Math.floor(start_x * col)+start_x;
-		var c_y = Math.floor(start_y * row)+start_y;
-	    output += &quot;&lt;circle cx=&#39;&quot; + c_x + &quot;&#39; cy=&#39;&quot; + c_y + &quot;&#39; r=&#39;15&#39; fill=&#39;#868e96&#39;/&gt;&quot;;
-	    //var c = &quot;&lt;circle cx=&#39;&quot; + c_x + &quot;&#39; cy=&#39;&quot; + c_y + &quot;&#39; r=&#39;20&#39;/&gt;&quot;;
-		//circles.push(c);
+	    if (setup.map[row][col].discovered) {
+	      var c_x = Math.floor(start_x * col)+start_x;
+        var c_y = Math.floor(start_y * row)+start_y;
+	      output += &quot;&lt;circle cx=&#39;&quot; + c_x + &quot;&#39; cy=&#39;&quot; + c_y + &quot;&#39; r=&#39;15&#39; fill=&#39;#868e96&#39;/&gt;&quot;;
+  	  }
 	  }
-	}
   }
   output += &quot;&lt;/svg&gt;&quot;;
   setup.map_viz = output;
 &lt;&lt;/script&gt;&gt;
 &lt;&lt;= setup.map_viz&gt;&gt;
+/*
 &lt;&lt;for _rid to 0; _rid lt setup.HEIGHT; _rid++&gt;&gt;\
   &lt;section class=&quot;map&quot;&gt;\
   &lt;&lt;for _cid to 0; _cid lt setup.WIDTH; _cid++&gt;&gt;\
@@ -1508,6 +1489,7 @@ x\
   &lt;&lt;/for&gt;&gt;\
   &lt;/section&gt;\
 &lt;&lt;/for&gt;&gt;\
+*/
 &lt;&lt;/if&gt;&gt;\</tw-passagedata></tw-storydata>
 	<script id="script-sugarcube" type="text/javascript">
 	/*! SugarCube JS */

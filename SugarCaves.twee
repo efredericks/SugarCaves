@@ -122,76 +122,23 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
 
 <div id="proc-content">\
 \
-
-<<set _validMoves to setup.checkValidMoves(setup.map, $player.row, $player.col)>>
-<<for _i to 0; _i lt _validMoves.length; _i++>>
-(\
-<<= _validMoves[_i][0]>>\
-x\
-<<= _validMoves[_i][1]>>\
-)
+\
+<<set _validMoves to setup.checkValidMoves(setup.map, $player.row, $player.col)>>\
+<<for _i to 0; _i lt _validMoves.length; _i++>>\
+  <<capture _i, $player, _newRow, _newCol>>\
+    <<set _newRow to _validMoves[_i][0]>>\
+    <<set _newCol to _validMoves[_i][1]>>\
+    <<set _temp_title to String(_newRow) + ":" + String(_newCol) + "::" + setup.map[_newRow][_newCol].title>>\
+    /*<<link [[setup.map[_newRow][_newCol].title|ProcGen]]>>*/
+    <<link [[_temp_title|ProcGen]]>>
+      <<set $player.last_row = $player.row>>
+      <<set $player.last_col = $player.col>>
+      <<set $player.row = _newRow>>
+      <<set $player.col = _newCol>>
+    <</link>>
+  <</capture>>\
 <</for>>
-/*<<= $player.pos>>\*/
-/* 
-<<for _i to 0; _i lt $player.checkMoves.length; _i++>>
-(<<= $player.checkMoves[_i][0]>>\
-<<= $player.checkMoves[_i][1]>>)
-<<link [[_i|ProcGen]]>>
-  <<set $player.last_row = $player.row>>
-  <<set $player.last_col = $player.col>>   
-  <<set $player.row = $player.checkMoves[_i][0]>>
-  <<set $player.col = $player.checkMoves[_i][1]>>
-<</link>>
--
-<</for>>
-*/
-
-/*
-<<for _i to 0; _i lt $player.possibleMoves.length; _i++>>
-  <<set _newRow to $player.possibleMoves[_i][0]>>\
-  <<set _newCol to $player.possibleMoves[_i][1]>>\
-  <<set _newDIR to $player.possibleMoves[_i][2]>>\
-  <<= _newRow>>x<<= _newCol>><<= _newDIR>><<link [[setup.map[_newRow][_newCol].title|ProcGen]]>>
-    <<set $player.last_row = $player.row>>
-    <<set $player.last_col = $player.col>>
-    <<set $player.row = _newRow>>
-    <<set $player.col = _newCol>>
-  <</link>>
-<</for>>
-<<link [[test_e|procgen]]>>
-  <<set $player.col = $player.col += 1>>
-  <<set $player.last_row = $player.row>>
-  <<set $player.last_col = $player.col>>   
-<</link>>
-<<link [[TEST_SE|ProcGen]]>>
-  <<set $player.row = $player.row += 1>>
-  <<set $player.col = $player.col += 1>>
-  <<set $player.last_row = $player.row>>
-  <<set $player.last_col = $player.col>>   
-<</link>>
-<<link [[TEST_S|ProcGen]]>>
-  <<set $player.row = $player.row += 1>>
-  <<set $player.last_row = $player.row>>
-  <<set $player.last_col = $player.col>>   
-<</link>>
-<<link [[TEST_SW|ProcGen]]>>
-  <<set $player.row = $player.row += 1>>
-  <<set $player.col = $player.col -= 1>>
-  <<set $player.last_row = $player.row>>
-  <<set $player.last_col = $player.col>>   
-<</link>>
-<<link [[TEST_W|ProcGen]]>>
-  <<set $player.col = $player.col -= 1>>
-  <<set $player.last_row = $player.row>>
-  <<set $player.last_col = $player.col>>   
-<</link>>
-<<link [[GO BACK|ProcGen]]>>
-  <<set $player.col = $player.last_col>>
-  <<set $player.row = $player.last_row>>
-<</link>>
-*/
 </div>
-
 
 :: PassageHeader [PassageHeader]
 <div id="back"></div>\
@@ -217,6 +164,19 @@ x\
 :: map
 /* draw a circle in each map cell and draw a line to it? */
 <<if tags().includes("map")>>\
+<div id="table_map">
+<<= setup.drawMap(setup.map, $player)>>
+</div>
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
 <<script>>
   var output = "<svg id='map_viz' width='600' height='200' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'>";
   output += "<rect width='600' height='200' fill='#f1f3f5'/>";
@@ -228,19 +188,18 @@ x\
   
   for (var row = 0; row < setup.HEIGHT; row++) {
     for (var col = 0; col < setup.WIDTH; col++) {
-	  if (setup.map[row][col].discovered) {
-	    var c_x = Math.floor(start_x * col)+start_x;
-		var c_y = Math.floor(start_y * row)+start_y;
-	    output += "<circle cx='" + c_x + "' cy='" + c_y + "' r='15' fill='#868e96'/>";
-	    //var c = "<circle cx='" + c_x + "' cy='" + c_y + "' r='20'/>";
-		//circles.push(c);
+	    if (setup.map[row][col].discovered) {
+	      var c_x = Math.floor(start_x * col)+start_x;
+        var c_y = Math.floor(start_y * row)+start_y;
+	      output += "<circle cx='" + c_x + "' cy='" + c_y + "' r='15' fill='#868e96'/>";
+  	  }
 	  }
-	}
   }
   output += "</svg>";
   setup.map_viz = output;
 <</script>>
 <<= setup.map_viz>>
+/*
 <<for _rid to 0; _rid lt setup.HEIGHT; _rid++>>\
   <section class="map">\
   <<for _cid to 0; _cid lt setup.WIDTH; _cid++>>\
@@ -261,4 +220,5 @@ x\
   <</for>>\
   </section>\
 <</for>>\
+*/
 <</if>>\

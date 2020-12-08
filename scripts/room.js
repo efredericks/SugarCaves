@@ -1,3 +1,17 @@
+// move this elsewhere eventually
+setup.drawMap = function(_map, _player) {
+  let _render = "<table>";
+  for (let _row = 0; _row < _map.length; _row++) {
+    _render += "<tr>";
+    for (let _col = 0; _col < _map[_row].length; _col++) {
+      _render += `<td style="background-color: ${(_map[_row][_col].blocked ? "#666": "#444")};"> ${(_player.col == _col && _player.row == _row ? "P" : "" )}</td>`;
+    }
+    _render += "</tr>";
+  }
+	_render += "</table>";
+	return _render;
+}
+
 // Class that outlines a room
 class Room {
 	constructor (title, description, noise_value) {

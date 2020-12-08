@@ -11,6 +11,7 @@ setup.checkValidMoves = function(_map, _row, _col) {
 	for (var _r = up_row; _r <= down_row; _r++) {
 		for (var _c = left_col; _c <= right_col; _c++) {
 			if ((!(_map[_r][_c].blocked)) && ((_r != _row) || (_c != _col)))
+			// try this next time: if (!_map[_r][_c].blocked && !(_r === _row && _c === _col))
           moves.push([_r, _c]);
 		}
 	}
