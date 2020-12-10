@@ -342,3 +342,28 @@ td {
   height: 20px;
   text-align: center;
 }
+
+/* Drunk Text - Start 
+c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
+*/
+.drunk {
+	animation: drunkCam 10s infinite alternate;
+	color: white;
+}
+@keyframes drunkCam {
+	0%  { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	20% { filter: blur(1px); text-shadow: 8px 0 0 grey; }
+	24% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	26% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	28% { filter: blur(1px); text-shadow: 10px 0 0 grey; }
+	30% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	60% { filter: blur(1px); text-shadow: 5px 0 0 grey; }
+	62% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	65% { filter: blur(2px); text-shadow: 8px 0 0 grey; }
+	67% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	80% { filter: blur(0px); text-shadow: 8px 0 0 grey; }
+	85% { filter: blur(2px); text-shadow: 10px 0 0 grey; }
+	88% { filter: blur(1px); text-shadow: 5px 0 0 grey; }
+	90% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+}
+/* Drunk Text - End */

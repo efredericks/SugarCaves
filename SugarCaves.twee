@@ -56,6 +56,8 @@ You see the base of the mountain rising gently in the distance, its granite face
 
 [[Skip | ProcGen]]
 
+<div class='drunk'>This is a test of drunken text</div>
+
 
 :: storm [noinventory]
 A wild thunderstorm that produced high winds, golf-ball sized hail, and pounding rain. Your house, fortunately, was unaffected.  You end your musings and get [[back to playing|over there]].
@@ -165,7 +167,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
 /* draw a circle in each map cell and draw a line to it? */
 <<if tags().includes("map")>>\
 <div id="table_map">
-<<= setup.drawMap(setup.map, $player)>>
+<<= setup.drawMap(setup.map, $player, setup.friends)>>
 </div>
 \
 \

@@ -94,8 +94,6 @@ setup.traceryImport.then(function () {
 		}
 	}
 	
-	// Then place your friends and carve out paths to them and beyond
-	
 	// Then initialize yourself fool
 	map[0][0].discovered = true;
 	
@@ -126,7 +124,16 @@ setup.traceryImport.then(function () {
 		}
 	}
 	setup.flashlightFriend = randomInt(0, NUM_FRIENDS);
-  setup.friends[setup.flashlightFriend].inventory['flashlight'] = true;
+	setup.friends[setup.flashlightFriend].inventory['flashlight'] = true;
+
+	// Then place your friends and carve out paths to them and beyond
+	for (let _f = 0; _f < setup.friends.length; _f++) {
+		let _c = randomInt(0, map[0].length);
+		let _r = randomInt(0, map.length);
+		setup.friends[_f].row = _r;
+		setup.friends[_f].col = _c;
+	}
+	
 	
 	console.log(setup.friends);
 	setup.currentChar = "TBD"; // set a global to make loading in the passage easier

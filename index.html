@@ -446,7 +446,32 @@ td {
   width: 20px;
   height: 20px;
   text-align: center;
-}</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
+}
+
+/* Drunk Text - Start 
+c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
+*/
+.drunk {
+	animation: drunkCam 10s infinite alternate;
+	color: white;
+}
+@keyframes drunkCam {
+	0%  { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	20% { filter: blur(1px); text-shadow: 8px 0 0 grey; }
+	24% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	26% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	28% { filter: blur(1px); text-shadow: 10px 0 0 grey; }
+	30% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	60% { filter: blur(1px); text-shadow: 5px 0 0 grey; }
+	62% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	65% { filter: blur(2px); text-shadow: 8px 0 0 grey; }
+	67% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	80% { filter: blur(0px); text-shadow: 8px 0 0 grey; }
+	85% { filter: blur(2px); text-shadow: 10px 0 0 grey; }
+	88% { filter: blur(1px); text-shadow: 5px 0 0 grey; }
+	90% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+}
+/* Drunk Text - End */</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
 /* js/constants.js, js/room.js, js/traceryGen.js, js/person.js, js/macroWhen.js */
 /* twine-user-script #2: "constants.js" */
 /** GLOBALS **/
@@ -1131,12 +1156,27 @@ class Person {
 window.Player = Person;
 /* twine-user-script #5: "room.js" */
 // move this elsewhere eventually
-setup.drawMap = function(_map, _player) {
+setup.drawMap = function(_map, _player, _friends) {
   let _render = "<table>";
   for (let _row = 0; _row < _map.length; _row++) {
     _render += "<tr>";
     for (let _col = 0; _col < _map[_row].length; _col++) {
-      _render += `<td style="background-color: ${(_map[_row][_col].blocked ? "#666": "#444")};"> ${(_player.col == _col && _player.row == _row ? "😐" : "" )}</td>`;
+			_render += `<td style="background-color: ${(_map[_row][_col].blocked ? "#666": "#444")};">`;
+			if (_player.col == _col && _player.row == _row)
+				_render += "😐";
+		  else {
+				var isEmpty = true;
+				for (let f = 0; f < _friends.length; f++) {
+					if (_friends[f].row == _row && _friends[f].col == _col) {
+						if (isEmpty)
+						  _render += "🤪";
+						isEmpty = false;
+					}
+				}
+				if (isEmpty)
+ 				  _render += "";
+			}
+			_render += `</td>`;
     }
     _render += "</tr>";
   }
@@ -1290,8 +1330,6 @@ setup.traceryImport.then(function () {
 		}
 	}
 	
-	// Then place your friends and carve out paths to them and beyond
-	
 	// Then initialize yourself fool
 	map[0][0].discovered = true;
 	
@@ -1322,7 +1360,16 @@ setup.traceryImport.then(function () {
 		}
 	}
 	setup.flashlightFriend = randomInt(0, NUM_FRIENDS);
-  setup.friends[setup.flashlightFriend].inventory['flashlight'] = true;
+	setup.friends[setup.flashlightFriend].inventory['flashlight'] = true;
+
+	// Then place your friends and carve out paths to them and beyond
+	for (let _f = 0; _f < setup.friends.length; _f++) {
+		let _c = randomInt(0, map[0].length);
+		let _r = randomInt(0, map.length);
+		setup.friends[_f].row = _r;
+		setup.friends[_f].col = _c;
+	}
+	
 	
 	console.log(setup.friends);
 	setup.currentChar = "TBD"; // set a global to make loading in the passage easier
@@ -1366,7 +1413,9 @@ setup.traceryImport.then(function () {
 You (&lt;&lt;= $player.name&gt;&gt;) and your four closest friends (&lt;&lt;link [[setup.friends[0].name|CharacterInfo]]&gt;&gt;&lt;&lt;set setup.currentChar to 0&gt;&gt;&lt;&lt;/link&gt;&gt;, &lt;&lt;link [[setup.friends[1].name|CharacterInfo]]&gt;&gt;&lt;&lt;set setup.currentChar to 1&gt;&gt;&lt;&lt;/link&gt;&gt;, &lt;&lt;link [[setup.friends[2].name|CharacterInfo]]&gt;&gt;&lt;&lt;set setup.currentChar to 2&gt;&gt;&lt;&lt;/link&gt;&gt;, and &lt;&lt;link [[setup.friends[3].name|CharacterInfo]]&gt;&gt;&lt;&lt;set setup.currentChar to 3&gt;&gt;&lt;&lt;/link&gt;&gt;) are out adventuring in the woods. &lt;&lt;= setup.friends[0].name&gt;&gt; yells, &quot;hey, look [[over there|over there]]!&quot;
 &lt;&lt;/when&gt;&gt;</tw-passagedata><tw-passagedata pid="3" name="over there" tags="noinventory" position="350,100" size="100,100">You see the base of the mountain rising gently in the distance, its granite face gently reflecting the afternoon sun. A recent [[storm]] caused a small rockslide, revealing an [[opening]].
 
-[[Skip | ProcGen]]</tw-passagedata><tw-passagedata pid="4" name="storm" tags="noinventory" position="475,100" size="100,100">A wild thunderstorm that produced high winds, golf-ball sized hail, and pounding rain. Your house, fortunately, was unaffected.  You end your musings and get [[back to playing|over there]].</tw-passagedata><tw-passagedata pid="5" name="opening" tags="noinventory" position="600,100" size="100,100">You approach the mountainside to get a better look at the newly-opened cave. In all the years that you played at the foot of the mountain, you never noticed that there might be more hiding in plain sight.
+[[Skip | ProcGen]]
+
+&lt;div class=&#39;drunk&#39;&gt;This is a test of drunken text&lt;/div&gt;</tw-passagedata><tw-passagedata pid="4" name="storm" tags="noinventory" position="475,100" size="100,100">A wild thunderstorm that produced high winds, golf-ball sized hail, and pounding rain. Your house, fortunately, was unaffected.  You end your musings and get [[back to playing|over there]].</tw-passagedata><tw-passagedata pid="5" name="opening" tags="noinventory" position="600,100" size="100,100">You approach the mountainside to get a better look at the newly-opened cave. In all the years that you played at the foot of the mountain, you never noticed that there might be more hiding in plain sight.
 
 The cave opening is irregularly-shaped, rocky outcroppings studding its edges. It is dark but [[passable]].</tw-passagedata><tw-passagedata pid="6" name="passable" tags="noinventory" position="725,100" size="100,100">You and your friends pierce the darkness and adventure in. &lt;&lt;link [[setup.friends[setup.flashlightFriend].name|CharacterInfo]]&gt;&gt;&lt;&lt;set setup.currentChar to setup.flashlightFriend&gt;&gt;&lt;&lt;/link&gt;&gt; clicks on the [[flashlight]] and sweeps the beam across. The light shines down a dark tunnel, illuminating dust that has been disturbed by your entry.
 
@@ -1434,7 +1483,7 @@ You are carrying:
 &lt;&lt;back&gt;&gt;</tw-passagedata><tw-passagedata pid="16" name="map" tags="" position="725,225" size="100,100">/* draw a circle in each map cell and draw a line to it? */
 &lt;&lt;if tags().includes(&quot;map&quot;)&gt;&gt;\
 &lt;div id=&quot;table_map&quot;&gt;
-&lt;&lt;= setup.drawMap(setup.map, $player)&gt;&gt;
+&lt;&lt;= setup.drawMap(setup.map, $player, setup.friends)&gt;&gt;
 &lt;/div&gt;
 \
 \

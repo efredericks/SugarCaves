@@ -1,10 +1,25 @@
 // move this elsewhere eventually
-setup.drawMap = function(_map, _player) {
+setup.drawMap = function(_map, _player, _friends) {
   let _render = "<table>";
   for (let _row = 0; _row < _map.length; _row++) {
     _render += "<tr>";
     for (let _col = 0; _col < _map[_row].length; _col++) {
-      _render += `<td style="background-color: ${(_map[_row][_col].blocked ? "#666": "#444")};"> ${(_player.col == _col && _player.row == _row ? "😐" : "" )}</td>`;
+			_render += `<td style="background-color: ${(_map[_row][_col].blocked ? "#666": "#444")};">`;
+			if (_player.col == _col && _player.row == _row)
+				_render += "😐";
+		  else {
+				var isEmpty = true;
+				for (let f = 0; f < _friends.length; f++) {
+					if (_friends[f].row == _row && _friends[f].col == _col) {
+						if (isEmpty)
+						  _render += "🤪";
+						isEmpty = false;
+					}
+				}
+				if (isEmpty)
+ 				  _render += "";
+			}
+			_render += `</td>`;
     }
     _render += "</tr>";
   }
