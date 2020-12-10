@@ -476,8 +476,8 @@ c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
 /* twine-user-script #2: "constants.js" */
 /** GLOBALS **/
 const NUM_FRIENDS = 4;
-const WIDTH = 10;
-const HEIGHT = 10;
+const WIDTH = 40;
+const HEIGHT = 40;
 const ROOM_TYPES = {
 	NORMAL: 0,
 	OPEN: 1,
@@ -1234,6 +1234,72 @@ class Room {
 	}	
 }
 /* twine-user-script #6: "traceryGen.js" */
+function drunkardsWalk(_map, _start, _target) {
+	// Now carve out a path with a drunkard's walk from one corner to the other
+	var done = false;
+	var c_row  = _start[0];
+	var c_col  = _start[1];
+	while (!done) {
+		_map[c_row][c_col].blocked = false;
+		
+		if ((c_row == (_target[0]-1)) && (c_col == (_target[1]-1)))
+				done = true;
+		else { // update our slobbering drunk
+		  /*
+			0 1 2
+			3 . 4
+			5 6 7
+			*/
+			var dir = randomInt(0,8);
+		  switch (dir) {
+				case 0:
+					if (c_col > 0)
+						c_col -= 1;
+					if (c_row > 0)
+						c_row -= 1;
+				  break;
+				case 1:
+					if (c_row > 0)
+						c_row -= 1;
+					break;
+				case 2:
+					if (c_row < (_target[0]-1))
+						c_row += 1;
+					if (c_col < (_target[1]-1))
+						c_col += 1;
+					break;
+				case 3:
+					if (c_col > 0)
+						c_col -= 1;
+					break;
+				case 4:
+					if (c_col < (_target[0]-1))
+						c_col += 1;
+					break;
+				case 5:
+					if (c_col > 0)
+						c_col -= 1;
+					if (c_row < (_target[0]-1))
+						c_row += 1;
+					break;
+				case 6:
+					if (c_row < (_target[0]-1))
+						c_row += 1;
+					break;
+				case 7:
+				default:
+					if (c_row < (_target[0]-1))
+						c_row += 1;
+					if (c_col < (_target[1]-1))
+						c_col += 1;
+					break;
+			}
+		}
+	}
+	
+  return _map;
+}
+
 // Import a script while saving the returned Promise so it may be used later
 setup.traceryImport = importScripts("js/tracery.js", "js/mods-eng-basic.js", "js/simplex-noise.js");
 
@@ -1266,78 +1332,12 @@ setup.traceryImport.then(function () {
       t_row[col] = new Room("title " + row + "," + col, "desc", simplex.noise2D(col, row));
     }
     map[row] = t_row;
-  }
-	
-	// Now carve out a path with a drunkard's walk from one corner to the other
-	var done = false;
-	var c_row  = 0;
-	var c_col  = 0;
-	while (!done) {
-		map[c_row][c_col].blocked = false;
-		
-		if ((c_row == (HEIGHT-1)) && (c_col == (WIDTH-1)))
-				done = true;
-		else { // update our slobbering drunk
-		  /*
-			0 1 2
-			3 . 4
-			5 6 7
-			*/
-			var dir = randomInt(0,8);
-		  switch (dir) {
-				case 0:
-					if (c_col > 0)
-						c_col -= 1;
-					if (c_row > 0)
-						c_row -= 1;
-				  break;
-				case 1:
-					if (c_row > 0)
-						c_row -= 1;
-					break;
-				case 2:
-					if (c_row < (HEIGHT-1))
-						c_row += 1;
-					if (c_col < (WIDTH-1))
-						c_col += 1;
-					break;
-				case 3:
-					if (c_col > 0)
-						c_col -= 1;
-					break;
-				case 4:
-					if (c_col < (HEIGHT-1))
-						c_col += 1;
-					break;
-				case 5:
-					if (c_col > 0)
-						c_col -= 1;
-					if (c_row < (HEIGHT-1))
-						c_row += 1;
-					break;
-				case 6:
-					if (c_row < (HEIGHT-1))
-						c_row += 1;
-					break;
-				case 7:
-				default:
-					if (c_row < (HEIGHT-1))
-						c_row += 1;
-					if (c_col < (WIDTH-1))
-						c_col += 1;
-					break;
-			}
-		}
 	}
 	
+	map = drunkardsWalk(map, [0,0], [map.length,map[0].length]);
+
 	// Then initialize yourself fool
 	map[0][0].discovered = true;
-	
-	//window.GameMap = map;
-	setup.map = map;
-	setup.WIDTH = WIDTH;
-	setup.HEIGHT = HEIGHT;
-	console.log(setup.map);//window.GameMap);
 	
 	// setup friends while in here
 	setup.friends = new Array();
@@ -1368,11 +1368,19 @@ setup.traceryImport.then(function () {
 		let _r = randomInt(0, map.length);
 		setup.friends[_f].row = _r;
 		setup.friends[_f].col = _c;
+
+		map = drunkardsWalk(map, [_r,_c],[randomInt(0,map.length),randomInt(0,map[0].length)]);
 	}
 	
 	
 	console.log(setup.friends);
 	setup.currentChar = "TBD"; // set a global to make loading in the passage easier
+
+	setup.map = map;
+	setup.WIDTH = map[0].length;
+	setup.HEIGHT = map.length;
+	console.log(setup.map);//window.GameMap);
+	
 	
 	grammar.addModifiers(baseEngModifiers);
 	var story = grammar.flatten("#origin#");
