@@ -16,8 +16,38 @@ setup.drawMap = function(_map, _player, _friends) {
 						isEmpty = false;
 					}
 				}
-				if (isEmpty)
- 				  _render += "";
+				if (isEmpty && !_map[_row][_col].blocked) {
+					switch (_map[_row][_col].room_type) {
+						case ROOM_TYPES.STALAGS:
+							_render += "△";
+							break;
+						case ROOM_TYPES.OPEN:
+							_render += "_";
+							break;
+						case ROOM_TYPES.TIGHT:
+							_render += "⁜";
+							break;
+						case ROOM_TYPES.STREAM:
+							_render += "~";
+							break;
+						case ROOM_TYPES.POOL:
+							_render += "⊜";
+							break;
+						case ROOM_TYPES.VOID:
+							_render += "ↈ";
+							break;
+						case ROOM_TYPES.ROCKY:
+							_render += "⋙";
+							break;
+						case ROOM_TYPES.NORMAL:
+						default:
+							_render += " ";
+							break;
+					}
+					 //_render += "";
+				} else {
+				  _render += " ";
+				}
 			}
 			_render += `</td>`;
     }

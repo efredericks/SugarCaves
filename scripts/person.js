@@ -38,6 +38,25 @@ setup.checkValidMoves = function(_map, _row, _col) {
 	return moves;
 }
 
+setup.tickGame = function(_map, _player, _friends) {
+	// update NPC movements
+	// update random events
+	for (let _f = 0; _f < _friends.length; _f++) {
+		if (Math.random() > 0.90) { // move the friend a random direction
+			let f_moves = setup.checkValidMoves(_map, _friends[_f].row, _friends[_f].col);
+			let _m = randomInt(0, f_moves.length);
+
+			_friends[_f].last_row = _friends[_f].row;
+			_friends[_f].last_col = _friends[_f].col;
+			_friends[_f].row = _m[0];
+			_friends[_f].col = _m[1];
+			setup.friends[_f] = _friends[_f];
+			console.log(_f, _friends[_f]);
+		}
+	}
+}
+
+
 // Class that represents a player
 class Person {
   constructor(opts) {

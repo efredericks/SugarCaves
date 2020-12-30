@@ -140,6 +140,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
     <</link>>\
   <</capture>>\
 <</for>>
+<<run setup.tickGame(setup.map, $player, setup.friends)>>
 </div>
 
 :: PassageHeader [PassageHeader]

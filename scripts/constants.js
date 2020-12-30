@@ -1,7 +1,7 @@
 /** GLOBALS **/
-const NUM_FRIENDS = 4;
-const WIDTH = 40;
-const HEIGHT = 40;
+const NUM_FRIENDS = 2;
+const WIDTH = 40;//40;
+const HEIGHT = 20;//40;
 const ROOM_TYPES = {
 	NORMAL: 0,
 	OPEN: 1,
@@ -18,6 +18,10 @@ Object.freeze(ROOM_TYPES);
 function randomInt(min, max) {  
   return Math.floor(Math.random()*(max-min)+min);
 } 
+
+function randomFloat(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
 /**** FROM CORPORA ****/
 // From https://github.com/dariusk/corpora/

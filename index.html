@@ -475,9 +475,9 @@ c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
 /* js/constants.js, js/room.js, js/traceryGen.js, js/person.js, js/macroWhen.js */
 /* twine-user-script #2: "constants.js" */
 /** GLOBALS **/
-const NUM_FRIENDS = 4;
-const WIDTH = 40;
-const HEIGHT = 40;
+const NUM_FRIENDS = 2;
+const WIDTH = 40;//40;
+const HEIGHT = 20;//40;
 const ROOM_TYPES = {
 	NORMAL: 0,
 	OPEN: 1,
@@ -494,6 +494,10 @@ Object.freeze(ROOM_TYPES);
 function randomInt(min, max) {  
   return Math.floor(Math.random()*(max-min)+min);
 } 
+
+function randomFloat(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
 /**** FROM CORPORA ****/
 // From https://github.com/dariusk/corpora/
@@ -988,6 +992,25 @@ setup.checkValidMoves = function(_map, _row, _col) {
 	return moves;
 }
 
+setup.tickGame = function(_map, _player, _friends) {
+	// update NPC movements
+	// update random events
+	for (let _f = 0; _f < _friends.length; _f++) {
+		if (Math.random() > 0.90) { // move the friend a random direction
+			let f_moves = setup.checkValidMoves(_map, _friends[_f].row, _friends[_f].col);
+			let _m = randomInt(0, f_moves.length);
+
+			_friends[_f].last_row = _friends[_f].row;
+			_friends[_f].last_col = _friends[_f].col;
+			_friends[_f].row = _m[0];
+			_friends[_f].col = _m[1];
+			setup.friends[_f] = _friends[_f];
+			console.log(_f, _friends[_f]);
+		}
+	}
+}
+
+
 // Class that represents a player
 class Person {
   constructor(opts) {
@@ -1173,8 +1196,38 @@ setup.drawMap = function(_map, _player, _friends) {
 						isEmpty = false;
 					}
 				}
-				if (isEmpty)
- 				  _render += "";
+				if (isEmpty && !_map[_row][_col].blocked) {
+					switch (_map[_row][_col].room_type) {
+						case ROOM_TYPES.STALAGS:
+							_render += "△";
+							break;
+						case ROOM_TYPES.OPEN:
+							_render += "_";
+							break;
+						case ROOM_TYPES.TIGHT:
+							_render += "⁜";
+							break;
+						case ROOM_TYPES.STREAM:
+							_render += "~";
+							break;
+						case ROOM_TYPES.POOL:
+							_render += "⊜";
+							break;
+						case ROOM_TYPES.VOID:
+							_render += "ↈ";
+							break;
+						case ROOM_TYPES.ROCKY:
+							_render += "⋙";
+							break;
+						case ROOM_TYPES.NORMAL:
+						default:
+							_render += " ";
+							break;
+					}
+					 //_render += "";
+				} else {
+				  _render += " ";
+				}
 			}
 			_render += `</td>`;
     }
@@ -1475,6 +1528,7 @@ You are carrying:
     &lt;&lt;/link&gt;&gt;\
   &lt;&lt;/capture&gt;&gt;\
 &lt;&lt;/for&gt;&gt;
+&lt;&lt;run setup.tickGame(setup.map, $player, setup.friends)&gt;&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="14" name="PassageHeader" tags="PassageHeader" position="475,225" size="100,100">&lt;div id=&quot;back&quot;&gt;&lt;/div&gt;\
 &lt;div id=&quot;front&quot;&gt;&lt;/div&gt;\
 \
