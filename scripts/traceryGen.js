@@ -1,5 +1,5 @@
 function drunkardsWalk(_map, _start, _target) {
-	// Now carve out a path with a drunkard's walk from one corner to the other
+	// Now carve out a (lazy) path with a drunkard's walk from one corner to the other
 	var done = false;
 	var c_row  = _start[0];
 	var c_col  = _start[1];
@@ -65,7 +65,7 @@ function drunkardsWalk(_map, _start, _target) {
 }
 
 // Import a script while saving the returned Promise so it may be used later
-setup.traceryImport = importScripts("js/tracery.js", "js/mods-eng-basic.js", "js/simplex-noise.js");
+setup.traceryImport = importScripts("js/tracery.js", "js/mods-eng-basic.js", "js/fast-simplex-noise.js");//"js/simplex-noise.js");
 
 // Use the returned Promise later on to ensure that the script has been fully
 // loaded before executing dependent code
@@ -88,17 +88,19 @@ setup.traceryImport.then(function () {
   var grammar = tracery.createGrammar(rules);
   
   /* Generate map */
-  var simplex = new SimplexNoise();
+	var noiseGen = new FastSimplexNoise({frequency: 0.01, octaves: 4});
+//  var simplex = new SimplexNoise();
 	var map = new Array(HEIGHT);
   for (var row = 0; row < HEIGHT; row++) {
 	  var t_row = new Array(WIDTH);
     for (var col = 0; col < WIDTH; col++) {
-      t_row[col] = new Room("title " + row + "," + col, "desc", simplex.noise2D(col, row));
+			let s = noiseGen.get2DNoise(col, row);
+      t_row[col] = new Room("title " + row + "," + col, "desc", s);//simplex.noise2D(col, row));
     }
     map[row] = t_row;
 	}
 	
-	map = drunkardsWalk(map, [0,0], [map.length,map[0].length]);
+	//map = drunkardsWalk(map, [0,0], [map.length,map[0].length]);
 
 	// Then initialize yourself fool
 	map[0][0].discovered = true;

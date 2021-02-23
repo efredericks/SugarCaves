@@ -1,7 +1,7 @@
 /** GLOBALS **/
 const NUM_FRIENDS = 2;
 const WIDTH = 40;//40;
-const HEIGHT = 20;//40;
+const HEIGHT = 40;//40;
 const ROOM_TYPES = {
 	NORMAL: 0,
 	OPEN: 1,

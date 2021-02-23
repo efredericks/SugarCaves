@@ -24,9 +24,6 @@ SugarCaves
 */
 /* Globals */\
 <<set $player to new Player("Erik")>>
-<<set $num_friends to 4>>\
-<<set $num_rooms to 20>>\
-<<set $current_room_id to 0>>\
 \
 /* 
  * Generate rooms 
@@ -48,7 +45,7 @@ SugarCaves
 \
 :: Begin [noinventory] 
 <<when setup.traceryImport>>
-You (<<= $player.name>>) and your four closest friends (<<link [[setup.friends[0].name|CharacterInfo]]>><<set setup.currentChar to 0>><</link>>, <<link [[setup.friends[1].name|CharacterInfo]]>><<set setup.currentChar to 1>><</link>>, <<link [[setup.friends[2].name|CharacterInfo]]>><<set setup.currentChar to 2>><</link>>, and <<link [[setup.friends[3].name|CharacterInfo]]>><<set setup.currentChar to 3>><</link>>) are out adventuring in the woods. <<= setup.friends[0].name>> yells, "hey, look [[over there|over there]]!"
+You (<<= $player.name>>) and your <<= setup.friends.length>> closest friends (<<link [[setup.friends[0].name|CharacterInfo]]>><<set setup.currentChar to 0>><</link>>, <<link [[setup.friends[1].name|CharacterInfo]]>><<set setup.currentChar to 1>><</link>>, <<link [[setup.friends[2].name|CharacterInfo]]>><<set setup.currentChar to 2>><</link>>, and <<link [[setup.friends[3].name|CharacterInfo]]>><<set setup.currentChar to 3>><</link>>) are out adventuring in the woods. <<= setup.friends[0].name>> yells, "hey, look [[over there|over there]]!"
 <</when>>
 
 :: over there [noinventory]
